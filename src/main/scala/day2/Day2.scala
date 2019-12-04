@@ -43,9 +43,9 @@ object Day2 {
   }
 
   @scala.annotation.tailrec
-  def findMagicPairRec(program: List[Int], pairs: Seq[(Int, Int)], currentIndex: Int = 0): Either[String, (Int, Int)] = {
+  def findMagicPairRec(program: List[Int], pairs: Seq[(Int, Int)], currentIndex: Int = 0): Option[(Int, Int)] = {
     if (currentIndex >= pairs.length) {
-      Left("Exhausted search space")
+      Option.empty
     } else {
       val (a, b) = pairs(currentIndex)
       val updatedProgram = program
@@ -53,7 +53,7 @@ object Day2 {
         .updated(2, b)
       val result = runProgram(updatedProgram)
       result match {
-        case Right(output) if (output.nonEmpty && output(0) == 19690720) => Right((a, b))
+        case Right(output) if (output.nonEmpty && output(0) == 19690720) => Option((a, b))
         case _             => findMagicPairRec(program, pairs, currentIndex + 1)
       }
     }
