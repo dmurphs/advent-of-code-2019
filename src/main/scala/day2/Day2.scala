@@ -62,8 +62,9 @@ object Day2 {
   def partTwo(): Unit = {
     val possibleAddressValues = 0 to 99
     val pairs = for (a <- possibleAddressValues; b <- possibleAddressValues) yield (a, b)
-    val magicPairResult = findMagicPairRec(programFromFile, pairs)
-    val magicNumber = magicPairResult.map({ case (a: Int, b: Int) => a * 100 + b })
+    val magicNumber: Option[Int] = for (
+      (a, b) <- findMagicPairRec(programFromFile, pairs)
+    ) yield a * 100 + b
     println(magicNumber)
   }
 }
