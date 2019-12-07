@@ -61,15 +61,32 @@ object Day3 {
     y2.abs + x2.abs
   }
 
-  def findIntersections(): Unit = {
+  def findIntersectionWithMinManhattanDistance(): Unit = {
     val path1 :: path2 :: _ = getWirePaths
     val path1Coordinates = recordCoordinates(path1)
     val path2Coordinates = recordCoordinates(path2)
-
     val intersections = path1Coordinates.intersect(path2Coordinates)
-    val intersectionsWithManhattanDistances = intersections
-      .map(intersection => (intersection, manhattanDistanceFromOrigin(intersection)))
-    println(intersectionsWithManhattanDistances
-      .minBy({ case (_, distance) => distance }))
+
+    println(
+      intersections
+        .map(intersection => (intersection, manhattanDistanceFromOrigin(intersection)))
+        .minBy({ case (_, distance) => distance })
+    )
+  }
+
+  def numStepsToIntersection(coordinates: List[(Int, Int)], intersection: (Int, Int)): Int ={
+    coordinates.indexOf(intersection) + 1
+  }
+
+  def findMinCombinedPathDistanceAmongIntersections(): Unit = {
+    val path1 :: path2 :: _ = getWirePaths
+    val path1Coordinates = recordCoordinates(path1)
+    val path2Coordinates = recordCoordinates(path2)
+    val intersections = path1Coordinates.intersect(path2Coordinates)
+
+    println(intersections
+      .map(intersection => numStepsToIntersection(path1Coordinates, intersection) + numStepsToIntersection(path2Coordinates, intersection))
+      .min
+    )
   }
 }
