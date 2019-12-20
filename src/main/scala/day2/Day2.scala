@@ -7,22 +7,31 @@ object Day2 {
   @scala.annotation.tailrec
   def runProgram(program: List[Int], start: Int = 0): Either[String, List[Int]] = {
     val opcode = program(start)
+    val safeIndex = (i: Int) => if (i >= 0 && program.length > i)
+      Option(program(i))
+      else Option.empty
+    val safeUpdate = (i: Int, value: Int) => if (i >= 0 && program.length > i)
+      Option(program.updated(i, value))
+      else Option.empty
+
     opcode match {
       case 1 | 2 => {
-        val firstIndex = program(start + 1)
-        val secondIndex = program(start + 2)
-        val indexToUpdate = program(start + 3)
+        val operation = if (opcode == 1)
+          (a: Int, b: Int) => a + b
+          else (a: Int, b: Int) => a * b
 
-        val isValidIndex = (i: Int) => i >= 0 && program.length > i
-        val canUpdate = program.length > start + 4  && isValidIndex(firstIndex) && isValidIndex(secondIndex) && isValidIndex(indexToUpdate)
-        if (canUpdate) {
-          val operation = if (opcode == 1)
-            (a: Int, b: Int) => a + b
-            else (a: Int, b: Int) => a * b
+        val updatedProgramResult = for (
+          firstIndex <- safeIndex(start + 1);
+          secondIndex <- safeIndex(start + 2);
+          indexToUpdate <- safeIndex(start + 3);
+          firstValue <- safeIndex(firstIndex);
+          secondValue <- safeIndex(secondIndex);
+          updated <- safeUpdate(indexToUpdate, operation(firstValue, secondValue))
+        ) yield updated
 
-          val result = operation(program(firstIndex), program(secondIndex))
-          runProgram(program.updated(indexToUpdate, result), start + 4)
-        } else Left(s"Opcode had invalid instructions at $start")
+        if (updatedProgramResult.isDefined) {
+          runProgram(updatedProgramResult.get, start + 4)
+        } else Left(s"Invalid instruction at $start")
       }
       case 99 => Right(program)
       case _  => Left(s"Encountered invalid opcode at $start")
