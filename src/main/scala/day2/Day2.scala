@@ -2,17 +2,12 @@ package day2
 
 import scala.io.Source
 import scala.util.Using
+import utils.Utils.ExtendedList
 
 object Day2 {
   @scala.annotation.tailrec
   def runProgram(program: List[Int], start: Int = 0): Either[String, List[Int]] = {
     val opcode = program(start)
-    val safeIndex = (i: Int) => if (i >= 0 && program.length > i)
-      Option(program(i))
-      else Option.empty
-    val safeUpdate = (i: Int, value: Int) => if (i >= 0 && program.length > i)
-      Option(program.updated(i, value))
-      else Option.empty
 
     opcode match {
       case 1 | 2 => {
@@ -21,12 +16,12 @@ object Day2 {
           else (a: Int, b: Int) => a * b
 
         val updatedProgramResult = for (
-          firstIndex <- safeIndex(start + 1);
-          secondIndex <- safeIndex(start + 2);
-          indexToUpdate <- safeIndex(start + 3);
-          firstValue <- safeIndex(firstIndex);
-          secondValue <- safeIndex(secondIndex);
-          updated <- safeUpdate(indexToUpdate, operation(firstValue, secondValue))
+          firstIndex <- program.safeIndex(start + 1);
+          secondIndex <- program.safeIndex(start + 2);
+          indexToUpdate <- program.safeIndex(start + 3);
+          firstValue <- program.safeIndex(firstIndex);
+          secondValue <- program.safeIndex(secondIndex);
+          updated <- program.safeUpdate(indexToUpdate, operation(firstValue, secondValue))
         ) yield updated
 
         if (updatedProgramResult.isDefined) {
